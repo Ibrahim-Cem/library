@@ -1,5 +1,5 @@
 <?php
-    class users{
+    class user{
         public $userID;
         public $userName;
         public $name;
@@ -9,31 +9,55 @@
 
         public function __construct(){
             session_start();
-            if(!isset($_SESSION['userName'])){
+            /*if(!isset($_SESSION['userName'])){
                 session_destroy();
+            }*/
+        }
+    
+        public function login($userName, $passW){
+            require("db.php");
+            $query =  $db->prepare("SELECT * FROM Users WHERE userName = ? and passW = ?");
+            $query->execute(array($userName, $passW));
+
+            $users = $query-> fetchAll(PDO::FETCH_OBJ);
+            $passW = null;
+
+            if($query->rowCount() == 1){
+                //session_start();
+                foreach ($users as $u){
+                    $this->userID = $u->userID;
+                    $this->userName = $u->userName;
+                    $this->name = $u->name;
+                    $this->surName = $u->surName;
+                    $this->RGTime = $u->registerTime;
+                }
+                $_SESSION['userID'] = $this->userID;
+                $_SESSION['userName'] = $this->userName;
+                $_SESSION['name'] = $this->name;
+                $_SESSION['RGTime'] = $this->RGTime;
+
+                header("Refresh:0 ; url=index.php");
+            }
+            else{
+                $message = "User not found or wrong password!";
+                echo "
+                    <script type = 'text/javascript'>
+                        alert('$message');
+                    </script>
+                ";
+                $this->logout();
             }
         }
-        public function login($userName, $passW){
-            $this->userName =$userName;
-            $this->passW =$passW;
-            
-            require_once "db.php";
 
-            $query = $db->prepare("SELECT * FROM users WHERE
-            userName = ? and passW = ?
-            ");
-             $query->execute(array($this->userName, $this->passW));
-        
-            if ($query->rowCount()){
-                session_start();
-                foreach($query as $row){
-                    $_SESSION['userID'] = $row['userID'];
-                    $_SESSION['userName'] = $row['userName'];
-                    $_SESSION['name'] = $row['name'];
-                    $_SESSION['RGTime'] = $row['registerTime'];
-
-                }
-            } 
+        public function logout(){
+            session_unset();
+            session_destroy();
+            header("Refresh:0 ; url=index.html");
         }
-    }
+        public function isSession(){
+            if(!isset($_SESSION['userName']) && !isset($_SESSION['userID'])){
+                $this->logout();
+            }
+        }
+    } 
 ?>
