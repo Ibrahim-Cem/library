@@ -36,16 +36,14 @@
                 $_SESSION['name'] = $this->name;
                 $_SESSION['RGTime'] = $this->RGTime;
 
-                header("Refresh:0 ; url=index.php");
+               // header("Refresh:0 ; url=index.php");
+
+               echo "1";
             }
             else{
-                $message = "User not found or wrong password!";
-                echo "
-                    <script type = 'text/javascript'>
-                        alert('$message');
-                    </script>
-                ";
-                $this->logout();
+                //$message = "User not found or wrong password!";
+                 echo "0";
+                 $this->logout();
             }
         }
 
